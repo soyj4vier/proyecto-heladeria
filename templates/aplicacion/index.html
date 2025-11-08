@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Heladería Secreto helado</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="#">🍦 Secreto helado</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="#">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Administrador</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Promociones</a></li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-success"><b>{{ user.username }}</b></a>
+                    </li>
+                    <li class="nav-item">
+                        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link nav-link text-warning" style="padding: 0;">Cerrar Sesión</button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a href="{% url 'login' %}" class="nav-link">Iniciar Sesión</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="bg-light py-5 text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold text-primary">Helados Artesanales</h1>
+            <p class="lead text-secondary mb-4">Disfruta del sabor más dulce del verano, hecho con ingredientes 100%
+                naturales.</p>
+            <a href="#" class="btn btn-primary btn-lg">Ver Sabores</a>
+        </div>
+    </header>
+
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Nuestros Favoritos</h2>
+            <div class="row text-center">
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <img src="https://images.unsplash.com/photo-1613489716914-92acdfe372fb?q=80&w=806&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                            class="card-img-top" alt="Helado de frutilla">
+                        <div class="card-body">
+                            <h5 class="card-title">Frutilla Natural</h5>
+                            <p class="card-text">Refrescante, dulce y con trozos reales de fruta.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <img src="https://images.unsplash.com/photo-1580915411954-282cb1b0d780?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                            class="card-img-top" alt="Helado de chocolate" height="455px">
+                        <div class="card-body">
+                            <h5 class="card-title">Chocolate Belga</h5>
+                            <p class="card-text">El favorito de todos, con cacao puro y cremoso sabor.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <img src="https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=600&q=60"
+                            class="card-img-top" alt="Helado de vainilla">
+                        <div class="card-body">
+                            <h5 class="card-title">Vainilla Clásica</h5>
+                            <p class="card-text">Suavidad y aroma únicos, un sabor que nunca pasa de moda.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-primary text-white text-center py-3">
+        <p class="mb-0">&copy; 2025 Heladería Secreto Helado | Todos los derechos reservados</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

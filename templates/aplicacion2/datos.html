@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Información del usuario {{ nombre }}</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+</head>
+<body class="bg-info">
+    <ul>
+        <li>Nombre: {{ nombre }}</li>
+        <li>Apellido: {{ apellido }}</li>
+        <li>Edad: {{ edad }}</li>
+        <li>Sexo: {{ sexo }}</li>
+    </ul>
+    <img src="{% static 'img/ogro.webp' %}" alt="Imagen de ogro">
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+# --- Entorno virtual ---
+entorno/
+venv/
+
+# --- Archivos de Python ---
+__pycache__/
+*.py[cod]
+*.so
+
+# --- Archivos de configuración y variables ---
+*.env
+.env
+config.local.json
+
+# --- Base de datos local ---
+db.sqlite3
+
+# --- Archivos temporales y logs ---
+*.log
+*.pot
+*.pyc
+*.pyo
+
+# --- Archivos del editor ---
+.vscode/
+.idea/
+
+# --- Archivos de build o cache ---
+build/
+dist/

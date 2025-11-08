@@ -1,0 +1,171 @@
+from django import forms
+import datetime
+from aplicacion.models import Cliente, MovimientoPuntos
+from aplicacion2.models import Producto, Promocion, ProductoPromocion, DetallePromocion, TipoDescuento
+
+class ClienteForm(forms.ModelForm):
+    run = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'EJ: 123456789'}))
+    nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese nombre'}))
+    apellido_paterno = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'Ingrese apellido paterno'}))
+    apellido_materno = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'Ingrese apellido materno'}))
+    puntos = forms.IntegerField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ej: +0000'}))
+
+    class Meta:
+        model = Cliente
+        fields = '__all__'
+
+    def limpiar_run(self):
+        run = str(self.cleaned_data['run']).replace('.', '').replace('-', '')
+        try:
+            run = int(run)
+        except ValueError:
+            raise ValueError("El RUN debe contener solo números después de limpiarlo.")
+        return run
+
+    def clean_nombre(self):
+        nombre = self.cleaned_data['nombre']
+        return nombre.lower()
+
+    def clean_apellido_paterno(self):
+        apellido_paterno = self.cleaned_data['apellido_paterno']
+        return apellido_paterno.lower()
+
+    def clean_apellido_materno(self):
+        apellido_materno = self.cleaned_data['apellido_materno']
+        return apellido_materno.lower()
+
+    def clean_puntos(self):
+        puntos = self.cleaned_data['puntos']
+        if puntos < 0:
+            raise forms.ValidationError("Los puntos deben ser cero o positivos.")
+        return puntos    
+
+class MovimientoPuntosForm(forms.ModelForm):
+    fecha = forms.DateField(widget=forms.DateInput(attrs={'class':'form-control','placeholder':'dd/mm/aa','type':'date'}))
+    puntos = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ej: +0000'}))
+    descripcion = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Descripción breve'}))
+    cliente = forms.ModelChoiceField(
+        queryset=Cliente.objects.all(),
+        empty_label="Seleccione un cliente",
+        widget=forms.Select(attrs={'class':'form-control'})
+    )
+    
+    class Meta:
+        model = MovimientoPuntos
+        fields = '__all__'
+
+    def clean_fecha(self):
+        fecha = self.cleaned_data.get('fecha')
+
+        minima = datetime.date(2000,1,1)
+        maxima = datetime.date.today()
+
+        if fecha:
+            if fecha < minima or fecha > maxima:
+                raise forms.ValidationError("La fecha de nacimiento debe estar entre los 2000 y hoy")
+        return fecha
+
+class TipoDescuentoForm(forms.ModelForm):
+    nombre = forms.CharField(widget= forms.TextInput(attrs= {'class':'form-control', 'placeholder':'Ingrese el tipo de descuento'}))
+    descripcion = forms.CharField(widget= forms.TextInput(attrs= {'class':'form-control', 'placeholder':'Ingrese una descripción breve'}))
+
+    def clean_nombre(self):
+        nombre = self.cleaned_data['nombre']
+        return nombre.lower()
+    
+    def clean_descripcion(self):
+        descripcion = self.cleaned_data['descripcion']
+        return descripcion.lower()
+
+    class Meta:
+        model = TipoDescuento
+        fields = '__all__'
+
+class PromocionForm(forms.ModelForm):
+    nombre = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ingrese el nombre de la promoción',}))
+    descripcion = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ingrese una descripción'}))
+    fecha_inicio = forms.DateField(widget=forms.DateInput(attrs={'class':'form-control','placeholder':'dd/mm/aa','type':'date'}))
+    fecha_fin = forms.DateField(widget=forms.DateInput(attrs={'class':'form-control','placeholder':'dd/mm/aa','type':'date'}))
+    activo = forms.BooleanField(required= False, widget= forms.CheckboxInput(attrs={'class':'form-check-input'}))
+
+    def clean_nombre(self):
+        nombre = self.cleaned_data['nombre']
+        return nombre.lower()
+    
+    def clean_descripcion(self):
+        descripcion = self.cleaned_data['descripcion']
+        return descripcion.lower()
+    
+    def clean_fecha_ini(self):
+        fecha_inicio = self.cleaned_data.get('fecha_inicio')
+
+        minima = datetime.date(2000,1,1)
+        maxima = datetime.date(2100,1,1)
+
+        if fecha_inicio:
+            if fecha_inicio < minima or fecha_inicio > maxima:
+                raise forms.ValidationError("La fecha debe estar entre los 2000 y posterior")
+        return fecha_inicio
+    
+    def clean_fecha_fin(self):
+        fecha_fin = self.cleaned_data.get('fecha_fin')
+
+        minima = datetime.date(2000,1,1)
+        maxima = datetime.date(2100,1,1)
+
+        if fecha_fin:
+            if fecha_fin < minima or fecha_fin > maxima:
+                raise forms.ValidationError("La fecha debe estar entre los 2000 y posterior")
+        return fecha_fin
+    
+    class Meta:
+        model = Promocion
+        fields = '__all__'
+
+class DetallePromocionForm(forms.ModelForm):
+    promocion = forms.ModelChoiceField(
+        queryset= Promocion.objects.all(),
+        empty_label= "Seleccione una promoción",
+        widget= forms.Select(attrs= {'class':'form-control'})
+    )
+    tipo_descuento = forms.ModelChoiceField(
+        queryset= TipoDescuento.objects.all(),
+        empty_label= "Seleccione el tipo de descuento",
+        widget= forms.Select(attrs= {'class':'form-control'})
+    )
+    valor_descuento = forms.DecimalField()
+    codigo_promocional = forms.IntegerField(widget= forms.TextInput(attrs= {'class':'form-control', 'placeholder':'Ingrese el valor en decimal EJ:00.0'}))
+    condicion = forms.CharField(widget= forms.TextInput(attrs= {'class':'form-control', 'placeholder':'Ingrese una condición(descripción) breve'}))
+
+    class Meta:
+        model = DetallePromocion
+        fields = '__all__'
+
+class ProductoForm(forms.ModelForm):
+    nombre = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ingrese nombre de producto'}))
+    precio = forms.IntegerField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ingrese precio'}))
+
+    def clean_nombre(self):
+        nombre = self.cleaned_data['nombre']
+        return nombre.lower()
+
+    class Meta:
+        model = Producto
+        fields = '__all__'
+
+class ProductoPromocionForm(forms.ModelForm):
+    producto = forms.ModelChoiceField(
+        queryset= Producto.objects.all(),
+        empty_label= "Seleccione un producto",
+        widget= forms.Select(attrs= {'class':'form-control'})
+    )
+
+    promocion = forms.ModelChoiceField(
+        queryset= Promocion.objects.all(),
+        empty_label= "Seleccione la promoción",
+        widget= forms.Select(attrs= {'class':'form-control'})
+    )
+
+    class Meta:
+        model = ProductoPromocion
+        fields = '__all__'
