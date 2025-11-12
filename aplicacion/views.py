@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from aplicacion.forms import ClienteForm, MovimientoPuntosForm, ProductoForm, PromocionForm, TipoDescuentoForm, DetallePromocionForm, ProductoPromocionForm
 from aplicacion2.models import Promocion
@@ -10,9 +11,11 @@ def index(request):
 def login_view(request):
     return render(request, 'registration/login.html')
 
+@login_required
 def inicio(request):
     return render(request, 'aplicacion/inicio.html')
 
+@login_required
 def crear_cliente(request):
     if request.method == 'POST':
         form = ClienteForm(request.POST)
@@ -33,6 +36,7 @@ def crear_movimiento(request):
         form = MovimientoPuntosForm()
     return render(request, 'aplicacion/movimientoadd.html', {'form': form})
 
+@login_required 
 def crear_promocion(request):
     if request.method == 'POST':
         producto_form = ProductoForm(request.POST, prefix='producto')
@@ -55,7 +59,7 @@ def crear_promocion(request):
         'tipo_form': tipo_form,
     })
 
-
+@login_required
 def listar_clientes(request):
     clientes = Cliente.objects.all()
     return render(request, 'aplicacion/clientes.html', {'clientes': clientes})
@@ -66,6 +70,7 @@ def cargar_cliente(request, run):
 
     return render(request, 'aplicacion/modificarcliente.html', {'form': form, 'cliente': cliente})
 
+@login_required
 def modificar_cliente(request, run):
     cliente = get_object_or_404(Cliente, run=run)
     if request.method == 'POST':
@@ -78,11 +83,13 @@ def modificar_cliente(request, run):
     
     return render(request, 'aplicacion/modificarcliente.html', {'form': form, 'cliente': cliente})
 
+@login_required
 def eliminar_cliente(request, run):
     cliente = get_object_or_404(Cliente, run=run)
     cliente.delete()
     return redirect('listarclientes')
 
+@login_required
 def listar_promociones(request):
     promociones = Promocion.objects.all()
     return render(request, 'aplicacion/promociones.html', {'promociones': promociones})

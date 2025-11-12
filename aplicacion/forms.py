@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 import datetime
 from aplicacion.models import Cliente, MovimientoPuntos
 from aplicacion2.models import Producto, Promocion, ProductoPromocion, DetallePromocion, TipoDescuento
@@ -23,16 +24,27 @@ class ClienteForm(forms.ModelForm):
         return run
 
     def clean_nombre(self):
-        nombre = self.cleaned_data['nombre']
+        nombre = self.cleaned_data.get('nombre', '').strip()
+
+        for palabra in nombre.split():
+            if not palabra.isalpha():
+                raise ValidationError("El nombre solo puede contener letras y espacios.")
+
         return nombre.lower()
 
     def clean_apellido_paterno(self):
-        apellido_paterno = self.cleaned_data['apellido_paterno']
-        return apellido_paterno.lower()
+        apellido = self.cleaned_data.get('apellido_paterno', '').strip()
+        for palabra in apellido.split():
+            if not palabra.isalpha():
+                raise ValidationError("El apellido solo puede contener letras y espacios.")
+        return apellido.lower()
 
     def clean_apellido_materno(self):
-        apellido_materno = self.cleaned_data['apellido_materno']
-        return apellido_materno.lower()
+        apellido = self.cleaned_data.get('apellido_materno', '').strip()
+        for palabra in apellido.split():
+            if not palabra.isalpha():
+                raise ValidationError("El apellido solo puede contener letras y espacios.")
+        return apellido.lower()
 
     def clean_puntos(self):
         puntos = self.cleaned_data['puntos']
@@ -169,3 +181,8 @@ class ProductoPromocionForm(forms.ModelForm):
     class Meta:
         model = ProductoPromocion
         fields = '__all__'
+
+
+#AGREGAR CONFIRMACION DE ELIMINACION --------
+#PIPE CHUPALO
+#AGREGAR que el boton de secreto heladeria reenvie al index
