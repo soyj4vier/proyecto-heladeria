@@ -34,7 +34,7 @@
                     <td>{{ promo.activo|yesno:"Sí,No" }}</td>
                     <td>
                         <a href="{% url 'cargarpromocion' promo.id %}" class="btn btn-info">Modificar</a>
-                        <a href="{% url 'eliminarpromocion' promo.id %}" class="btn btn-danger">Eliminar</a>
+                        <a href="{% url 'eliminarpromocion' promo.id %}" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta promoción?');">Eliminar</a>
                     </td>
                 </tr>
                 {% empty %}

@@ -129,6 +129,16 @@ class PromocionForm(forms.ModelForm):
             if fecha_fin < minima or fecha_fin > maxima:
                 raise forms.ValidationError("La fecha debe estar entre los 2000 y posterior")
         return fecha_fin
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fecha_inicio = cleaned_data.get('fecha_inicio')
+        fecha_fin = cleaned_data.get('fecha_fin')
+
+        if fecha_inicio and fecha_fin:
+            if fecha_fin < fecha_inicio:
+                raise forms.ValidationError("La fecha de finalización no puede ser anterior a la fecha de inicio.")
+        return cleaned_data
     
     class Meta:
         model = Promocion
@@ -183,6 +193,5 @@ class ProductoPromocionForm(forms.ModelForm):
         fields = '__all__'
 
 
-#AGREGAR CONFIRMACION DE ELIMINACION --------
-#PIPE CHUPALO
+#AGREGAR CONFIRMACION DE ELIMINACION 
 #AGREGAR que el boton de secreto heladeria reenvie al index

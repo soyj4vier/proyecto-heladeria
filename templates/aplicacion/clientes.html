@@ -31,7 +31,7 @@
                     <td>{{ cliente.puntos }}</td>
                     <td>
                         <a href="{% url 'modificarcliente' cliente.run %}" class="btn btn-info">Modificar</a>
-                        <a href="{% url 'eliminarcliente' cliente.run %}" class="btn btn-danger">Eliminar</a>
+                        <a href="{% url 'eliminarcliente' cliente.run %}" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este cliente?');">Eliminar</a>
                     </td>
                 </tr>
                 {% empty %}
