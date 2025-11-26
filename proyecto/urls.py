@@ -22,4 +22,5 @@ urlpatterns = [
     path('dashboard/promociones/', views.dashboard_promociones, name='dashboard_promociones'),
     path('buscar_clientes/', views.buscar_clientes, name='buscar_clientes'),
     path('buscar_promociones/', views.buscar_promociones, name='buscar_promociones'),
+    path('generar_reporte_promocion/<int:promocion_id>/', views.generar_reporte_promocion, name='generar_reporte_promocion'),
 ]

@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -32,3 +33,12 @@ class MovimientoPuntos(models.Model):
         db_table = 'movimiento_puntos'
         verbose_name = 'Movimiento puntos'
         verbose_name_plural = 'Movimientos Puntos'
+
+class ReportePromocion(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Usuario que generó el reporte")
+    nombre_archivo = models.CharField(max_length=255, verbose_name="Nombre del archivo")
+    fecha_generacion = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de generación")
+    promocion = models.ForeignKey('aplicacion2.Promocion', on_delete=models.CASCADE, verbose_name="Promoción asociada")
+
+    def __str__(self):
+        return f"{self.nombre_archivo} generado por {self.usuario.username} el {self.fecha_generacion}"

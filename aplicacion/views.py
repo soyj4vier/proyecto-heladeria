@@ -1,6 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.db.models import Sum, F
+from django.template.loader import render_to_string
+import os
+from aplicacion.models import ReportePromocion
+from django.conf import settings
+from xhtml2pdf import pisa
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from aplicacion.forms import ClienteForm, MovimientoPuntosForm, ProductoForm, PromocionForm, TipoDescuentoForm, DetallePromocionForm, ProductoPromocionForm
@@ -179,3 +184,51 @@ def eliminar_promocion(request, id):
 
 def saludo(request):
     return HttpResponse("Hola tú")
+
+@login_required
+def generar_reporte_promocion(request, promocion_id):
+    # Obtener la promoción
+    promocion = Promocion.objects.annotate(
+        total_descuento=Sum('detallepromocion__valor_descuento'),
+        impacto_economico=F('usos') * F('detallepromocion__valor_descuento')
+    ).get(id=promocion_id)
+
+    # Renderizar el contenido HTML para el PDF
+    template_path = 'aplicacion/reporte_promocion.html'
+    context = {
+        'promocion': promocion,
+        'usuario': request.user,
+        'usos': promocion.usos,
+        'total_descuento': promocion.total_descuento or 0,
+        'impacto_economico': promocion.impacto_economico or 0,
+    }
+    html = render_to_string(template_path, context)
+
+    # Crear el archivo PDF
+    nombre_archivo = f"reporte_promocion_{promocion.id}_{request.user.username}.pdf"
+    ruta_pdf = os.path.join(settings.STATICFILES_DIRS[0], 'pdf')
+    if not os.path.exists(ruta_pdf):
+        os.makedirs(ruta_pdf)
+    ruta_archivo = os.path.join(ruta_pdf, nombre_archivo)
+
+    with open(ruta_archivo, 'wb') as archivo_pdf:
+        pisa_status = pisa.CreatePDF(html, dest=archivo_pdf)
+
+    # Verificar si hubo errores
+    if pisa_status.err:
+        return HttpResponse('Hubo un error al generar el reporte.', status=500)
+
+    # Guardar el reporte en la base de datos
+    ReportePromocion.objects.create(
+        usuario=request.user,
+        nombre_archivo=nombre_archivo,
+        promocion=promocion
+    )
+
+    # Descargar el archivo
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
+    with open(ruta_archivo, 'rb') as archivo_pdf:
+        response.write(archivo_pdf.read())
+
+    return response
