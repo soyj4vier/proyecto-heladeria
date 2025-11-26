@@ -20,6 +20,7 @@ class Promocion(models.Model):
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
     activo = models.BooleanField(default=True)
+    usos = models.IntegerField(default=0)
 
     def __str__(self):
         return f"La promoción {self.nombre} esta {self.activo}, fecha inicio: {self.fecha_inicio} fecha_fin: {self.fecha_fin}"

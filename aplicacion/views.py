@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from django.db.models import Sum, F
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from aplicacion.forms import ClienteForm, MovimientoPuntosForm, ProductoForm, PromocionForm, TipoDescuentoForm, DetallePromocionForm, ProductoPromocionForm
@@ -14,6 +16,64 @@ def login_view(request):
 @login_required
 def inicio(request):
     return render(request, 'aplicacion/inicio.html')
+
+@login_required
+def dashboard_promociones(request):
+    # Obtener las promociones con sus métricas
+    promociones = Promocion.objects.annotate(
+        total_descuento=Sum('detallepromocion__valor_descuento'),  # Total de descuentos aplicados
+        impacto_economico=F('usos') * F('detallepromocion__valor_descuento')  # Impacto económico
+    ).order_by('-usos')  # Ordenar por cantidad de usos
+
+    return render(request, 'aplicacion/dashboard_promociones.html', {
+        'promociones': promociones,
+    })
+
+
+def buscar_clientes(request):
+    query = request.GET.get('q', '')  # Obtener el término de búsqueda
+    clientes = Cliente.objects.filter(
+        nombre__icontains=query
+    ) | Cliente.objects.filter(
+        run__icontains=query
+    )  # Filtrar por nombre o RUN
+
+    # Serializar los resultados
+    clientes_data = [
+        {
+            'run': cliente.run,
+            'nombre': cliente.nombre,
+            'apellido_paterno': cliente.apellido_paterno,
+            'apellido_materno': cliente.apellido_materno,
+            'puntos': cliente.puntos,
+        }
+        for cliente in clientes
+    ]
+
+    return JsonResponse({'clientes': clientes_data})
+
+def buscar_promociones(request):
+    query = request.GET.get('q', '')  # Obtener el término de búsqueda
+    promociones = Promocion.objects.filter(
+        nombre__icontains=query
+    ) | Promocion.objects.filter(
+        descripcion__icontains=query
+    )  # Filtrar por nombre o descripción
+
+    # Serializar los resultados
+    promociones_data = [
+        {
+            'id': promo.id,
+            'nombre': promo.nombre,
+            'descripcion': promo.descripcion,
+            'fecha_inicio': promo.fecha_inicio.strftime('%Y-%m-%d'),
+            'fecha_fin': promo.fecha_fin.strftime('%Y-%m-%d'),
+            'activo': promo.activo,
+        }
+        for promo in promociones
+    ]
+
+    return JsonResponse({'promociones': promociones_data})
 
 @login_required
 def crear_cliente(request):

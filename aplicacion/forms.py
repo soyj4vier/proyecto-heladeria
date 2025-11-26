@@ -194,4 +194,7 @@ class ProductoPromocionForm(forms.ModelForm):
 
 
 #AGREGAR CONFIRMACION DE ELIMINACION 
-#AGREGAR que el boton de secreto heladeria reenvie al index
+#AGREGAR que el botón de secreto heladeria reenvie al index
+
+
+# crear función que permita el analisis de promo

@@ -19,4 +19,7 @@ urlpatterns = [
     path('promocionescargar/<int:id>', views.cargar_promocion, name='cargarpromocion'),
     path('promocioneseliminar/<int:id>/', views.eliminar_promocion, name='eliminarpromocion'),
     path('movimientoadd/', views.crear_movimiento, name='crearmovimiento'),
+    path('dashboard/promociones/', views.dashboard_promociones, name='dashboard_promociones'),
+    path('buscar_clientes/', views.buscar_clientes, name='buscar_clientes'),
+    path('buscar_promociones/', views.buscar_promociones, name='buscar_promociones'),
 ]

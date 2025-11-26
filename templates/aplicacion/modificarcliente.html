@@ -8,50 +8,59 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <div class="row mt-5">
-            <div class="col">
-                <h2>Modificar cliente</h2>
+    <header class="bg-light py-5 text-center">
+        <div class="container">
+            <h1 class="display-5 fw-bold text-primary">Modificar Cliente</h1>
+            <p class="lead text-secondary mb-4">Actualiza la información del cliente.</p>
+        </div>
+    </header>
+
+    <div class="container mt-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
                 <form method="POST" action="">
                     {% csrf_token %}
                     <div class="row">
                         {{ form.non_field_errors }}
-                        <div class="col-3 mb-3">
+                        <div class="col-md-6 mb-3">
                             {{ form.run.label_tag }}
                             {{ form.run }}
                             {{ form.run.errors }}
                         </div>
-                        <div class="col-3 mb-3">
+                        <div class="col-md-6 mb-3">
                             {{ form.nombre.label_tag }}
                             {{ form.nombre }}
                             {{ form.nombre.errors }}
                         </div>
-                        <div class="col-3 mb-3">
+                        <div class="col-md-6 mb-3">
                             {{ form.apellido_paterno.label_tag }}
                             {{ form.apellido_paterno }}
                             {{ form.apellido_paterno.errors }}
                         </div>
-                        <div class="col-3 mb-3">
+                        <div class="col-md-6 mb-3">
                             {{ form.apellido_materno.label_tag }}
                             {{ form.apellido_materno }}
                             {{ form.apellido_materno.errors }}
                         </div>
-                        <div class="col-3 mb-3">
+                        <div class="col-md-6 mb-3">
                             {{ form.puntos.label_tag }}
                             {{ form.puntos }}
                             {{ form.puntos.errors }}
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="d-flex justify-content-between">
                         <a class="btn btn-dark" href="{% url 'inicio' %}">Ir al inicio</a>
-                    </div>
-                    <div class="col">
                         <button type="submit" class="btn btn-primary">Guardar cambios</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <footer class="bg-primary text-white text-center py-3 mt-5">
+        <p class="mb-0">&copy; 2025 Heladería Secreto Helado</p>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
