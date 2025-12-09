@@ -23,4 +23,9 @@ urlpatterns = [
     path('buscar_clientes/', views.buscar_clientes, name='buscar_clientes'),
     path('buscar_promociones/', views.buscar_promociones, name='buscar_promociones'),
     path('generar_reporte_promocion/<int:promocion_id>/', views.generar_reporte_promocion, name='generar_reporte_promocion'),
+    path('transaccion/', views.sistema_transaccional, name='sistema_transaccional'),
 ]
+
+#crud clientes sprint 1
+#crud promos sprint 2
+#analisis promociones sprint 3

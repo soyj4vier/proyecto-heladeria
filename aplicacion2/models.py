@@ -33,7 +33,7 @@ class Promocion(models.Model):
 class DetallePromocion(models.Model):
     promocion = models.ForeignKey(Promocion, on_delete=models.CASCADE)
     tipo_descuento = models.ForeignKey(TipoDescuento, on_delete=models.CASCADE)
-    valor_descuento = models.DecimalField(max_digits=10, decimal_places=2)
+    valor_descuento = models.IntegerField()
     codigo_promocional = models.CharField(max_length=20, blank=True, null=True)
     condicion = models.TextField(blank=True)
 
@@ -47,7 +47,7 @@ class DetallePromocion(models.Model):
 
 class Producto (models.Model):
     nombre = models.CharField(max_length=50)
-    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    precio = models.IntegerField()
 
     def __str__(self):
         return f"El producto ingresado es {self.nombre} y el precio es {self.precio}"

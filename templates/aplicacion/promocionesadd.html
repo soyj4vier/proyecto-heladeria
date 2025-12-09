@@ -21,69 +21,140 @@
                 <form method="POST" action="{% url 'crearpromocion' %}">
                     {% csrf_token %}
                     <div class="row">
-                        {{ producto_form.non_field_errors }}
                         <h4 class="text-primary">1. Ingresar Producto</h4>
                         <div class="col-md-6 mb-3">
                             {{ producto_form.nombre.label_tag }}
                             {{ producto_form.nombre }}
-                            {{ producto_form.nombre.errors }}
+                            {% if producto_form.nombre.errors %}
+                                <div class="text-danger">
+                                    {{ producto_form.nombre.errors }}
+                                </div>
+                            {% endif %}
                         </div>
                         <div class="col-md-6 mb-3">
                             {{ producto_form.precio.label_tag }}
                             {{ producto_form.precio }}
-                            {{ producto_form.precio.errors }}
+                            {% if producto_form.precio.errors %}
+                                <div class="text-danger">
+                                    {{ producto_form.precio.errors }}
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                     <hr>
                     <div class="row">
-                        {{ promocion_form.non_field_errors }}
                         <h4 class="text-primary">2. Ingresar Promoción</h4>
                         <div class="col-md-6 mb-3">
                             {{ promocion_form.nombre.label_tag }}
                             {{ promocion_form.nombre }}
-                            {{ promocion_form.nombre.errors }}
+                            {% if promocion_form.nombre.errors %}
+                                <div class="text-danger">
+                                    {{ promocion_form.nombre.errors }}
+                                </div>
+                            {% endif %}
                         </div>
                         <div class="col-md-6 mb-3">
                             {{ promocion_form.descripcion.label_tag }}
                             {{ promocion_form.descripcion }}
-                            {{ promocion_form.descripcion.errors }}
+                            {% if promocion_form.descripcion.errors %}
+                                <div class="text-danger">
+                                    {{ promocion_form.descripcion.errors }}
+                                </div>
+                            {% endif %}
                         </div>
                         <div class="col-md-6 mb-3">
                             {{ promocion_form.fecha_inicio.label_tag }}
                             {{ promocion_form.fecha_inicio }}
-                            {{ promocion_form.fecha_inicio.errors }}
+                            {% if promocion_form.fecha_inicio.errors %}
+                                <div class="text-danger">
+                                    {{ promocion_form.fecha_inicio.errors }}
+                                </div>
+                            {% endif %}
                         </div>
                         <div class="col-md-6 mb-3">
                             {{ promocion_form.fecha_fin.label_tag }}
                             {{ promocion_form.fecha_fin }}
-                            {{ promocion_form.fecha_fin.errors }}
+                            {% if promocion_form.fecha_fin.errors %}
+                                <div class="text-danger">
+                                    {{ promocion_form.fecha_fin.errors }}
+                                </div>
+                            {% endif %}
                         </div>
                         <div class="col-md-6 mb-3">
-                            <div class="form-check mt-4">
-                                {{ promocion_form.activo }}
-                                {{ promocion_form.activo.label_tag }}
-                                {{ promocion_form.activo.errors }}
-                            </div>
+                            {{ promocion_form.activo.label_tag }}
+                            {{ promocion_form.activo }}
+                            {% if promocion_form.activo.errors %}
+                                <div class="text-danger">
+                                    {{ promocion_form.activo.errors }}
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                     <hr>
                     <div class="row">
-                        {{ tipo_form.non_field_errors }}
                         <h4 class="text-primary">3. Ingresar Tipo de Promoción</h4>
                         <div class="col-md-6 mb-3">
                             {{ tipo_form.nombre.label_tag }}
                             {{ tipo_form.nombre }}
-                            {{ tipo_form.nombre.errors }}
+                            {% if tipo_form.nombre.errors %}
+                                <div class="text-danger">
+                                    {{ tipo_form.nombre.errors }}
+                                </div>
+                            {% endif %}
                         </div>
                         <div class="col-md-6 mb-3">
                             {{ tipo_form.descripcion.label_tag }}
                             {{ tipo_form.descripcion }}
-                            {{ tipo_form.descripcion.errors }}
+                            {% if tipo_form.descripcion.errors %}
+                                <div class="text-danger">
+                                    {{ tipo_form.descripcion.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <h4 class="text-primary">4. Detalle de la Promoción</h4>
+                        <div class="col-md-6 mb-3">
+                            {{ detalle_form.valor_descuento.label_tag }}
+                            {{ detalle_form.valor_descuento }}
+                            {% if detalle_form.valor_descuento.errors %}
+                                <div class="text-danger">
+                                    {{ detalle_form.valor_descuento.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ detalle_form.codigo_promocional.label_tag }}
+                            {{ detalle_form.codigo_promocional }}
+                            {% if detalle_form.codigo_promocional.errors %}
+                                <div class="text-danger">
+                                    {{ detalle_form.codigo_promocional.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ detalle_form.condicion.label_tag }}
+                            {{ detalle_form.condicion }}
+                            {% if detalle_form.condicion.errors %}
+                                <div class="text-danger">
+                                    {{ detalle_form.condicion.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ detalle_form.tipo_descuento.label_tag }}
+                            {{ detalle_form.tipo_descuento }}
+                            {% if detalle_form.tipo_descuento.errors %}
+                                <div class="text-danger">
+                                    {{ detalle_form.tipo_descuento.errors }}
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="d-flex justify-content-between mt-4">
-                        <a class="btn btn-dark" href="{% url 'inicio' %}">Ir al inicio</a>
-                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Promoción</button>
+                        <a href="{% url 'inicio' %}" class="btn btn-secondary">Cancelar</a>
                     </div>
                 </form>
             </div>

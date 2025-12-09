@@ -53,13 +53,13 @@ class ClienteForm(forms.ModelForm):
         return puntos    
 
 class MovimientoPuntosForm(forms.ModelForm):
-    fecha = forms.DateField(widget=forms.DateInput(attrs={'class':'form-control','placeholder':'dd/mm/aa','type':'date'}))
-    puntos = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ej: +0000'}))
-    descripcion = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Descripción breve'}))
+    fecha = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    puntos = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ej: +10 o -10'}))
+    descripcion = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Descripción breve'}))
     cliente = forms.ModelChoiceField(
         queryset=Cliente.objects.all(),
         empty_label="Seleccione un cliente",
-        widget=forms.Select(attrs={'class':'form-control'})
+        widget=forms.Select(attrs={'class': 'form-control'})
     )
     
     class Meta:
@@ -74,8 +74,14 @@ class MovimientoPuntosForm(forms.ModelForm):
 
         if fecha:
             if fecha < minima or fecha > maxima:
-                raise forms.ValidationError("La fecha de nacimiento debe estar entre los 2000 y hoy")
+                raise forms.ValidationError("La fecha debe estar entre los 2000 y hoy")
         return fecha
+    
+    def clean_puntos(self):
+        puntos = self.cleaned_data['puntos']
+        if puntos == 0:
+            raise forms.ValidationError("Los puntos no pueden ser cero.")
+        return puntos
 
 class TipoDescuentoForm(forms.ModelForm):
     nombre = forms.CharField(widget= forms.TextInput(attrs= {'class':'form-control', 'placeholder':'Ingrese el tipo de descuento'}))
@@ -94,11 +100,12 @@ class TipoDescuentoForm(forms.ModelForm):
         fields = '__all__'
 
 class PromocionForm(forms.ModelForm):
-    nombre = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ingrese el nombre de la promoción',}))
-    descripcion = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ingrese una descripción'}))
-    fecha_inicio = forms.DateField(widget=forms.DateInput(attrs={'class':'form-control','placeholder':'dd/mm/aa','type':'date'}))
-    fecha_fin = forms.DateField(widget=forms.DateInput(attrs={'class':'form-control','placeholder':'dd/mm/aa','type':'date'}))
-    activo = forms.BooleanField(required= False, widget= forms.CheckboxInput(attrs={'class':'form-check-input'}))
+    nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el nombre de la promoción'}))
+    descripcion = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese una descripción'}))
+    fecha_inicio = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    fecha_fin = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    activo = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+    usos = forms.IntegerField(widget=forms.HiddenInput(), initial=0)  # Campo oculto con valor predeterminado
 
     def clean_nombre(self):
         nombre = self.cleaned_data['nombre']
@@ -142,30 +149,30 @@ class PromocionForm(forms.ModelForm):
     
     class Meta:
         model = Promocion
-        fields = '__all__'
+        fields = ['nombre', 'descripcion', 'fecha_inicio', 'fecha_fin', 'activo', 'usos']
 
 class DetallePromocionForm(forms.ModelForm):
     promocion = forms.ModelChoiceField(
-        queryset= Promocion.objects.all(),
-        empty_label= "Seleccione una promoción",
-        widget= forms.Select(attrs= {'class':'form-control'})
+        queryset=Promocion.objects.all(),
+        empty_label="Seleccione una promoción",
+        widget=forms.Select(attrs={'class': 'form-control'})
     )
     tipo_descuento = forms.ModelChoiceField(
-        queryset= TipoDescuento.objects.all(),
-        empty_label= "Seleccione el tipo de descuento",
-        widget= forms.Select(attrs= {'class':'form-control'})
+        queryset=TipoDescuento.objects.all(),
+        empty_label="Seleccione el tipo de descuento",
+        widget=forms.Select(attrs={'class': 'form-control'})
     )
-    valor_descuento = forms.DecimalField()
-    codigo_promocional = forms.IntegerField(widget= forms.TextInput(attrs= {'class':'form-control', 'placeholder':'Ingrese el valor en decimal EJ:00.0'}))
-    condicion = forms.CharField(widget= forms.TextInput(attrs= {'class':'form-control', 'placeholder':'Ingrese una condición(descripción) breve'}))
+    valor_descuento = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el valor en pesos'}))  # Cambiado a IntegerField
+    codigo_promocional = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el código promocional'}), required=False)
+    condicion = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese una condición breve'}), required=False)
 
     class Meta:
         model = DetallePromocion
         fields = '__all__'
 
 class ProductoForm(forms.ModelForm):
-    nombre = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ingrese nombre de producto'}))
-    precio = forms.IntegerField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ingrese precio'}))
+    nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese nombre de producto'}))
+    precio = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese precio en pesos'}))  # Cambiado a IntegerField
 
     def clean_nombre(self):
         nombre = self.cleaned_data['nombre']
@@ -191,10 +198,3 @@ class ProductoPromocionForm(forms.ModelForm):
     class Meta:
         model = ProductoPromocion
         fields = '__all__'
-
-
-#AGREGAR CONFIRMACION DE ELIMINACION 
-#AGREGAR que el botón de secreto heladeria reenvie al index
-
-
-# crear función que permita el analisis de promo
