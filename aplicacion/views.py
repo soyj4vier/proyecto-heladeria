@@ -13,6 +13,20 @@ from aplicacion2.models import Promocion
 from aplicacion.models import Cliente, MovimientoPuntos
 from aplicacion2.models import Producto, Promocion
 import datetime
+from aplicacion.serializers import ClienteSerializar
+from aplicacion.serializers import PromocionSerializar
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.permissions import BasePermission
+
+class IsAdminUser(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.role == 'nuevo_administrador'
+
+class IsVendedorUser(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.role == 'nuevo_vendedor'
 
 def index(request):
     return render(request, 'aplicacion/index.html')
@@ -337,3 +351,97 @@ def sistema_transaccional(request):
         'promociones': Promocion.objects.filter(activo=True),
         'productos': Producto.objects.all(),
     })
+
+# API PROMOCIONES
+
+def promocionesAPI(request):
+    promociones = Promocion.objects.all()
+    data = {
+        'promociones' : list(
+            promociones.values('nombre','descripcion','fecha_inicio','fecha_fin', 'activo', 'valor_descuento')
+        )
+    }
+    return JsonResponse(data)
+
+@api_view(['GET','POST'])
+def promocion_listado(request):
+    if request.method == 'GET':
+        promociones = Promocion.objects.all()
+        serializer = PromocionSerializar(promociones,many=True)
+        return Response(serializer.data)
+    
+    if request.method == 'POST':
+        serializer = PromocionSerializar(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET','PUT','DELETE'])    
+def promocion_detalle(request,pk):
+    try:
+        promocion = Promocion.objects.get(id=pk)
+    except Promocion.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'GET':
+        serializer = PromocionSerializar(promocion)
+        return Response(serializer.data)
+    
+    if request.method == 'PUT':
+        serializer = PromocionSerializar(promocion,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors,status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'DELETE':
+        promocion.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+# API CLIENTES
+
+def clientesAPI(request):
+    clientes = Cliente.objects.all()
+    data = {
+        'clientes' : list(
+            clientes.values('run','nombre','apellido_paterno','puntos')
+        )
+    }
+    return JsonResponse(data)
+
+@api_view(['GET','POST'])
+def cliente_listado(request):
+    if request.method == 'GET':
+        clientes = Cliente.objects.all()
+        serializer = ClienteSerializar(clientes,many=True)
+        return Response(serializer.data)
+    
+    if request.method == 'POST':
+        serializer = ClienteSerializar(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET','PUT','DELETE'])    
+def cliente_detalle(request,pk):
+    try:
+        cliente = Cliente.objects.get(run=pk)
+    except Cliente.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'GET':
+        serializer = ClienteSerializar(cliente)
+        return Response(serializer.data)
+    
+    if request.method == 'PUT':
+        serializer = ClienteSerializar(cliente,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors,status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'DELETE':
+        cliente.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

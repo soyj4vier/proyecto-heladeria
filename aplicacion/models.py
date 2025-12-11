@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser, Group, Permission
 
 # Create your models here.
 
@@ -42,3 +42,25 @@ class ReportePromocion(models.Model):
 
     def __str__(self):
         return f"{self.nombre_archivo} generado por {self.usuario.username} el {self.fecha_generacion}"
+
+class CustomUser(AbstractUser):
+    ROLE_CHOICES = [
+        ('admin', 'Administrador'),
+        ('vendedor', 'Vendedor'),
+    ]
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='vendedor')
+
+    groups = models.ManyToManyField(
+        Group,
+        related_name='customuser_set',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        verbose_name='groups',
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='customuser_set',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        verbose_name='user permissions',
+    )
