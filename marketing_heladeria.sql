@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 11-12-2025 a las 13:18:55
+-- Tiempo de generación: 11-12-2025 a las 16:42:29
 -- Versión del servidor: 8.3.0
 -- Versión de PHP: 8.2.18
 
@@ -20,6 +20,72 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `marketing_heladeria`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `aplicacion_customuser`
+--
+
+DROP TABLE IF EXISTS `aplicacion_customuser`;
+CREATE TABLE IF NOT EXISTS `aplicacion_customuser` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `password` varchar(128) COLLATE utf8mb3_spanish_ci NOT NULL,
+  `last_login` datetime(6) DEFAULT NULL,
+  `is_superuser` tinyint(1) NOT NULL,
+  `username` varchar(150) COLLATE utf8mb3_spanish_ci NOT NULL,
+  `first_name` varchar(150) COLLATE utf8mb3_spanish_ci NOT NULL,
+  `last_name` varchar(150) COLLATE utf8mb3_spanish_ci NOT NULL,
+  `email` varchar(254) COLLATE utf8mb3_spanish_ci NOT NULL,
+  `is_staff` tinyint(1) NOT NULL,
+  `is_active` tinyint(1) NOT NULL,
+  `date_joined` datetime(6) NOT NULL,
+  `role` varchar(10) COLLATE utf8mb3_spanish_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish_ci;
+
+--
+-- Volcado de datos para la tabla `aplicacion_customuser`
+--
+
+INSERT INTO `aplicacion_customuser` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`, `role`) VALUES
+(6, 'pbkdf2_sha256$600000$llE5LF7kiUrfLjEtttFBBo$j05aIIgYTYOL60BC39APj48wNm1NB9SPmmsNpa+stPQ=', NULL, 0, 'nuevo_vendedor', '', '', '', 0, 1, '2025-12-11 15:56:15.185044', 'vendedor'),
+(5, 'pbkdf2_sha256$600000$nwFTnkr90K7KQgmSL8z5Qm$0FE5t4H3RmiriBt4Jurj51Y6mxiXrA2ql48apK3ohb8=', NULL, 1, 'nuevo_administrador', '', '', '', 1, 1, '2025-12-11 15:55:52.369325', 'admin');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `aplicacion_customuser_groups`
+--
+
+DROP TABLE IF EXISTS `aplicacion_customuser_groups`;
+CREATE TABLE IF NOT EXISTS `aplicacion_customuser_groups` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `customuser_id` bigint NOT NULL,
+  `group_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `aplicacion_customuser_gr_customuser_id_group_id_95b4f5ab_uniq` (`customuser_id`,`group_id`),
+  KEY `aplicacion_customuser_groups_customuser_id_cf324d32` (`customuser_id`),
+  KEY `aplicacion_customuser_groups_group_id_d8b23004` (`group_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `aplicacion_customuser_user_permissions`
+--
+
+DROP TABLE IF EXISTS `aplicacion_customuser_user_permissions`;
+CREATE TABLE IF NOT EXISTS `aplicacion_customuser_user_permissions` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `customuser_id` bigint NOT NULL,
+  `permission_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `aplicacion_customuser_us_customuser_id_permission_c9cee199_uniq` (`customuser_id`,`permission_id`),
+  KEY `aplicacion_customuser_user_permissions_customuser_id_dd4914d8` (`customuser_id`),
+  KEY `aplicacion_customuser_user_permissions_permission_id_eb296d69` (`permission_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish_ci;
 
 -- --------------------------------------------------------
 
@@ -85,7 +151,7 @@ CREATE TABLE IF NOT EXISTS `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   KEY `auth_permission_content_type_id_2f476e4b` (`content_type_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish_ci;
 
 --
 -- Volcado de datos para la tabla `auth_permission`
@@ -147,7 +213,11 @@ INSERT INTO `auth_permission` (`id`, `name`, `content_type_id`, `codename`) VALU
 (53, 'Can add reporte promocion', 14, 'add_reportepromocion'),
 (54, 'Can change reporte promocion', 14, 'change_reportepromocion'),
 (55, 'Can delete reporte promocion', 14, 'delete_reportepromocion'),
-(56, 'Can view reporte promocion', 14, 'view_reportepromocion');
+(56, 'Can view reporte promocion', 14, 'view_reportepromocion'),
+(57, 'Can add user', 15, 'add_customuser'),
+(58, 'Can change user', 15, 'change_customuser'),
+(59, 'Can delete user', 15, 'delete_customuser'),
+(60, 'Can view user', 15, 'view_customuser');
 
 -- --------------------------------------------------------
 
@@ -170,15 +240,16 @@ CREATE TABLE IF NOT EXISTS `auth_user` (
   `date_joined` datetime(6) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish_ci;
 
 --
 -- Volcado de datos para la tabla `auth_user`
 --
 
 INSERT INTO `auth_user` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`) VALUES
-(1, 'pbkdf2_sha256$600000$mpVMSTDmq7nlRUPjbRTH1k$byPN8Dyl9EXafINMEknv2DtSUgEln9GzKp+l6/fLDts=', '2025-12-11 02:20:17.864155', 1, 'administrador', '', '', 'admin@mail.com', 1, 1, '2025-10-06 00:02:34.282258'),
-(2, 'pbkdf2_sha256$600000$oXXkS7VrdMSLdxRZHXcIp8$lNktXZoMg9dnNJE/w9LPECG7CUJEWrem9PIzbshFk8Y=', '2025-11-29 22:11:11.923248', 0, 'Javier', 'Javier', 'Pérez', 'javier.perez80@inacapmail.cl', 0, 1, '2025-11-29 22:10:04.000000');
+(1, 'pbkdf2_sha256$600000$mpVMSTDmq7nlRUPjbRTH1k$byPN8Dyl9EXafINMEknv2DtSUgEln9GzKp+l6/fLDts=', '2025-12-11 14:45:16.736129', 1, 'administrador', '', '', 'admin@mail.com', 1, 1, '2025-10-06 00:02:34.282258'),
+(5, 'pbkdf2_sha256$600000$jwByPFZhM7dBja2Cp2gIwV$3uyP3ezJrDd/xhmtBqH6fkPmATG7Kr3oiwVRo0FH4D4=', NULL, 1, 'javier_admin', '', '', '', 1, 1, '2025-12-11 16:35:59.420524'),
+(4, 'pbkdf2_sha256$600000$xnY5L1VCW58wVLB6bxsICR$Ao5vR7dxLxGgvIdYd2gdm2DgUc1HXDrHtdLsQKo3WeU=', NULL, 0, 'Vendedor', '', '', '', 0, 1, '2025-12-11 14:46:20.183961');
 
 -- --------------------------------------------------------
 
@@ -297,7 +368,18 @@ INSERT INTO `django_admin_log` (`id`, `action_time`, `object_id`, `object_repr`,
 (30, '2025-12-11 03:40:48.086904', '33', 'El producto ingresado es helado de vainilla y el precio es 1000', 3, '', 9, 1),
 (31, '2025-12-11 03:40:48.086904', '32', 'El producto ingresado es helado de frutilla y el precio es 1100', 3, '', 9, 1),
 (32, '2025-12-11 03:40:48.086904', '31', 'El producto ingresado es helado de chocolate y el precio es 1200', 3, '', 9, 1),
-(33, '2025-12-11 03:40:48.087906', '30', 'El producto ingresado es Helado de piña y el precio es 1000', 3, '', 9, 1);
+(33, '2025-12-11 03:40:48.087906', '30', 'El producto ingresado es Helado de piña y el precio es 1000', 3, '', 9, 1),
+(34, '2025-12-11 14:35:53.499428', '3', 'Vendedor', 1, '[{\"added\": {}}]', 4, 1),
+(35, '2025-12-11 14:42:34.389014', '2', 'Javier', 3, '', 4, 1),
+(36, '2025-12-11 14:45:55.155822', '3', 'Vendedor', 3, '', 4, 1),
+(37, '2025-12-11 14:46:20.643529', '4', 'Vendedor', 1, '[{\"added\": {}}]', 4, 1),
+(38, '2025-12-11 15:53:53.219845', '3', 'nuevo_admin', 2, '[{\"changed\": {\"fields\": [\"password\"]}}]', 15, 1),
+(39, '2025-12-11 15:55:19.057907', '1', 'admin_user', 3, '', 15, 1),
+(40, '2025-12-11 15:55:19.068907', '3', 'nuevo_admin', 3, '', 15, 1),
+(41, '2025-12-11 15:55:19.070906', '4', 'nuevo_vendedor', 3, '', 15, 1),
+(42, '2025-12-11 15:55:19.070906', '2', 'vendedor_user', 3, '', 15, 1),
+(43, '2025-12-11 15:55:52.927714', '5', 'nuevo_administrador', 1, '[{\"added\": {}}]', 15, 1),
+(44, '2025-12-11 15:56:15.783623', '6', 'nuevo_vendedor', 1, '[{\"added\": {}}]', 15, 1);
 
 -- --------------------------------------------------------
 
@@ -312,7 +394,7 @@ CREATE TABLE IF NOT EXISTS `django_content_type` (
   `model` varchar(100) COLLATE utf8mb3_spanish_ci NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish_ci;
 
 --
 -- Volcado de datos para la tabla `django_content_type`
@@ -332,7 +414,8 @@ INSERT INTO `django_content_type` (`id`, `app_label`, `model`) VALUES
 (11, 'aplicacion2', 'productopromocion'),
 (12, 'aplicacion2', 'detallepromocion'),
 (13, 'aplicacion', 'movimientopuntos'),
-(14, 'aplicacion', 'reportepromocion');
+(14, 'aplicacion', 'reportepromocion'),
+(15, 'aplicacion', 'customuser');
 
 -- --------------------------------------------------------
 
@@ -347,7 +430,7 @@ CREATE TABLE IF NOT EXISTS `django_migrations` (
   `name` varchar(255) COLLATE utf8mb3_spanish_ci NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish_ci;
 
 --
 -- Volcado de datos para la tabla `django_migrations`
@@ -381,7 +464,8 @@ INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES
 (25, 'aplicacion2', '0003_promocion_usos', '2025-11-26 00:38:15.577630'),
 (26, 'aplicacion', '0005_alter_cliente_table_reportepromocion', '2025-11-26 01:26:02.197500'),
 (27, 'aplicacion2', '0004_alter_detallepromocion_valor_descuento_and_more', '2025-12-08 21:35:22.218272'),
-(28, 'aplicacion2', '0005_remove_productopromocion_producto_and_more', '2025-12-11 03:01:58.365118');
+(28, 'aplicacion2', '0005_remove_productopromocion_producto_and_more', '2025-12-11 03:01:58.365118'),
+(29, 'aplicacion', '0006_customuser', '2025-12-11 14:25:45.343129');
 
 -- --------------------------------------------------------
 
@@ -404,9 +488,9 @@ CREATE TABLE IF NOT EXISTS `django_session` (
 
 INSERT INTO `django_session` (`session_key`, `session_data`, `expire_date`) VALUES
 ('2s9uvk5lj4j78rrpmruc7lnxp49d8n35', '.eJxVjMEOwiAQBf-FsyHQAgsevfcbCAuLVA0kpT0Z_9026UGvb2bem_mwrcVvnRY_J3Zlkl1-NwzxSfUA6RHqvfHY6rrMyA-Fn7TzqSV63U7376CEXvbaAKkEVojB2TyCVmgNksouQDbBAOqIkAeNIhk3ktAjkNgTl6XUxlr2-QLTqzdo:1v6E9P:zJ2aX-43NpkDmTQ02ZTfOUEicaIjpHP3ldNVv0lLMFE', '2025-10-21 20:19:11.337242'),
-('g4d59ariu4qv0mu3reyifvsd6v7v8cc5', '.eJxVjEEOwiAQRe_C2pBCQQaX7nsGMgODVA0kpV0Z765NutDtf-_9lwi4rSVsnZcwJ3ERSpx-N8L44LqDdMd6azK2ui4zyV2RB-1yaomf18P9OyjYy7eONjPlIdEQQQEAeuNAY2Kk0SqXwers2aJhfybvnQcyoyVtWRljlBLvD_zGN7w:1vRfPo:kMydTm7jjfYjnUE5o7gKFRTQlcRHeo5u0cZpRxQbJbE', '2025-12-19 23:40:44.553253'),
 ('w9dn2s2a1n9gvixdcdw8uvgikvtlo2kr', '.eJxVjEEOwiAQRe_C2pBCQQaX7nsGMgODVA0kpV0Z765NutDtf-_9lwi4rSVsnZcwJ3ERSpx-N8L44LqDdMd6azK2ui4zyV2RB-1yaomf18P9OyjYy7eONjPlIdEQQQEAeuNAY2Kk0SqXwers2aJhfybvnQcyoyVtWRljlBLvD_zGN7w:1vKPeC:Qw29kUKPANea3USKxZLHdzghvzbXbRCFI8cvO01LaTg', '2025-11-29 23:25:36.001221'),
-('lzm731emz03vwj38sv0u8s7y3mewsnsw', '.eJxVjEEOwiAQRe_C2pBCQQaX7nsGMgODVA0kpV0Z765NutDtf-_9lwi4rSVsnZcwJ3ERSpx-N8L44LqDdMd6azK2ui4zyV2RB-1yaomf18P9OyjYy7eONjPlIdEQQQEAeuNAY2Kk0SqXwers2aJhfybvnQcyoyVtWRljlBLvD_zGN7w:1vTWHx:PTNv66-agPHVjeav4ntBM-ajd6Rl1IX-bvtK7mVJETs', '2025-12-25 02:20:17.874175');
+('lzm731emz03vwj38sv0u8s7y3mewsnsw', '.eJxVjEEOwiAQRe_C2pBCQQaX7nsGMgODVA0kpV0Z765NutDtf-_9lwi4rSVsnZcwJ3ERSpx-N8L44LqDdMd6azK2ui4zyV2RB-1yaomf18P9OyjYy7eONjPlIdEQQQEAeuNAY2Kk0SqXwers2aJhfybvnQcyoyVtWRljlBLvD_zGN7w:1vTWHx:PTNv66-agPHVjeav4ntBM-ajd6Rl1IX-bvtK7mVJETs', '2025-12-25 02:20:17.874175'),
+('ps15dwz2eljc5ernef6ooyn3ksbgjevy', '.eJxVjEEOwiAQRe_C2pBCQQaX7nsGMgODVA0kpV0Z765NutDtf-_9lwi4rSVsnZcwJ3ERSpx-N8L44LqDdMd6azK2ui4zyV2RB-1yaomf18P9OyjYy7eONjPlIdEQQQEAeuNAY2Kk0SqXwers2aJhfybvnQcyoyVtWRljlBLvD_zGN7w:1vTizJ:m7jgqR7pVZPhoQu3ZQln5UW1nbRzd6yX8vAVNjqQk9g', '2025-12-25 15:53:53.248892');
 
 -- --------------------------------------------------------
 
@@ -472,7 +556,7 @@ CREATE TABLE IF NOT EXISTS `promocion` (
   `tipo_descuento` varchar(10) COLLATE utf8mb3_spanish_ci NOT NULL,
   `valor_descuento` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish_ci;
 
 --
 -- Volcado de datos para la tabla `promocion`
