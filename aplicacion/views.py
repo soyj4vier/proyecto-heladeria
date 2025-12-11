@@ -38,11 +38,15 @@ def dashboard_promociones(request):
 
 def buscar_clientes(request):
     query = request.GET.get('q', '')  # Obtener el término de búsqueda
+    print(f"Término de búsqueda recibido: {query}")  # Log para verificar el término de búsqueda
+
     clientes = Cliente.objects.filter(
         nombre__icontains=query
     ) | Cliente.objects.filter(
         run__icontains=query
     )  # Filtrar por nombre o RUN
+
+    print(f"Clientes encontrados: {clientes}")  # Log para verificar los clientes encontrados
 
     # Serializar los resultados
     clientes_data = [
@@ -56,6 +60,7 @@ def buscar_clientes(request):
         for cliente in clientes
     ]
 
+    print(f"Datos enviados al frontend: {clientes_data}")  # Log para verificar los datos enviados
     return JsonResponse({'clientes': clientes_data})
 
 def buscar_promociones(request):
@@ -168,12 +173,18 @@ def cargar_cliente(request, run):
 
 @login_required
 def modificar_cliente(request, run):
+    print(f"Run recibido para modificar: {run}")  # Log para verificar el RUN recibido
     cliente = get_object_or_404(Cliente, run=run)
+    print(f"Cliente encontrado: {cliente}")  # Log para verificar el cliente encontrado
+
     if request.method == 'POST':
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
             form.save()
+            print("Cliente modificado exitosamente.")  # Log para éxito en la modificación
             return redirect('inicio')
+        else:
+            print(f"Errores en el formulario: {form.errors}")  # Log para errores en el formulario
     else:
         form = ClienteForm(instance=cliente)
     

@@ -1,6 +1,7 @@
 $(document).ready(function () {
     $('#search-btn').click(function () {
         const query = $('#search-input').val(); // Obtener el valor del campo de búsqueda
+        console.log('Buscando clientes con el término:', query); // Log para verificar el término de búsqueda
 
         // Realizar la solicitud AJAX
         $.ajax({
@@ -8,10 +9,14 @@ $(document).ready(function () {
             type: 'GET',
             data: { q: query }, // Enviar el término de búsqueda como parámetro
             success: function (data) {
-                // Actualizar la tabla con los resultados
+                console.log('Datos recibidos del servidor:', data); // Log para verificar los datos recibidos
                 let tbody = '';
                 if (data.clientes.length > 0) {
                     data.clientes.forEach(cliente => {
+                        const modificarUrl = `/clientemodificado/${cliente.run}`; // URL corregida
+                        const eliminarUrl = `/clienteeliminar/${cliente.run}`;
+                        console.log('Generando URLs:', { modificarUrl, eliminarUrl }); // Log para verificar las URLs generadas
+
                         tbody += `
                             <tr>
                                 <td>${cliente.run}</td>
@@ -20,8 +25,8 @@ $(document).ready(function () {
                                 <td>${cliente.apellido_materno}</td>
                                 <td>${cliente.puntos}</td>
                                 <td>
-                                    <a href="/modificarcliente/${cliente.run}" class="btn btn-info">Modificar</a>
-                                    <a href="/eliminarcliente/${cliente.run}" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este cliente?');">Eliminar</a>
+                                    <a href="${modificarUrl}" class="btn btn-info">Modificar</a>
+                                    <a href="${eliminarUrl}" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este cliente?');">Eliminar</a>
                                 </td>
                             </tr>
                         `;
@@ -36,6 +41,7 @@ $(document).ready(function () {
                 $('tbody').html(tbody); // Actualizar el contenido de la tabla
             },
             error: function () {
+                console.error('Error al buscar clientes.'); // Log para errores en la solicitud AJAX
                 alert('Error al buscar clientes.');
             }
         });
