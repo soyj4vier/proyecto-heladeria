@@ -1,10 +1,32 @@
-Credenciales Administrador de Django:
+Credenciales Administrador y login de Django:
 user: Administrador
 contraseña: Ventana#123
 
-Credenciales login admin:
-user: Administrador
-contraseña: Ventana#123
+RUTAS PARA CONSEGUIR TOKEN
+
+ippublica/api/token
+ippublica/api/token/refresh
+
+Privilegios
+Usuario administrador, puede hacer de todo GET, POST, PUT, DELETE
+username:Administrador
+password:Ventana#123
+
+Usuario Vendedor, solo puede leer
+username: nuevo_vendedor
+password: Ventana#123
+
+RUTAS de API
+
+clientesapi/
+clienteslistapi/
+clienteslist/INSERTE ID
+
+RUTAS API PROMOCIONES
+
+promocionesapi/
+promocioneslistapi/
+promocioneslist/INSERTE ID
 
 Descripcion breve del proyecto:
 
