@@ -15,7 +15,7 @@
                     <th>Promoción</th>
                     <th>Descripción</th>
                     <th>Usos</th>
-                    <th>Total Descuento Aplicado</th>
+
                     <th>Impacto Económico</th>
                     <th>Acciones</th>
                 </tr>
@@ -26,8 +26,8 @@
                     <td>{{ promo.nombre }}</td>
                     <td>{{ promo.descripcion }}</td>
                     <td>{{ promo.usos }}</td>
-                    <td>${{ promo.total_descuento|default:"0.00" }}</td>
-                    <td>${{ promo.impacto_economico|default:"0.00" }}</td>
+
+                    <td>${{ promo.impacto_economico|default:"0" }}</td>
                     <td>
                         <a href="{% url 'generar_reporte_promocion' promo.id %}" class="btn btn-success">Generar Reporte</a>
                     </td>

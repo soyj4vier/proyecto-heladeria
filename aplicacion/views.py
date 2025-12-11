@@ -8,7 +8,7 @@ from django.conf import settings
 from xhtml2pdf import pisa
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from aplicacion.forms import ClienteForm, MovimientoPuntosForm, ProductoForm, PromocionForm, TipoDescuentoForm, DetallePromocionForm, ProductoPromocionForm
+from aplicacion.forms import ClienteForm, MovimientoPuntosForm, ProductoForm, PromocionForm
 from aplicacion2.models import Promocion
 from aplicacion.models import Cliente, MovimientoPuntos
 from aplicacion2.models import Producto, Promocion
@@ -28,27 +28,26 @@ def inicio(request):
 def dashboard_promociones(request):
     # Obtener las promociones con sus métricas
     promociones = Promocion.objects.annotate(
-        total_descuento=Sum('detallepromocion__valor_descuento'),  # Total de descuentos aplicados
-        impacto_economico=F('usos') * F('detallepromocion__valor_descuento')  # Impacto económico
-    ).order_by('-usos')  # Ordenar por cantidad de usos
+        impacto_economico=F('usos') * F('valor_descuento')  # Calcular el impacto
+    ).order_by('-usos')
 
     return render(request, 'aplicacion/dashboard_promociones.html', {
         'promociones': promociones,
     })
 
 def buscar_clientes(request):
-    query = request.GET.get('q', '')  # Obtener el término de búsqueda
-    print(f"Término de búsqueda recibido: {query}")  # Log para verificar el término de búsqueda
+    query = request.GET.get('q', '')
+    print(f"Término de búsqueda recibido: {query}")
 
     clientes = Cliente.objects.filter(
         nombre__icontains=query
     ) | Cliente.objects.filter(
         run__icontains=query
-    )  # Filtrar por nombre o RUN
+    ) 
 
-    print(f"Clientes encontrados: {clientes}")  # Log para verificar los clientes encontrados
+    print(f"Clientes encontrados: {clientes}")
 
-    # Serializar los resultados
+    
     clientes_data = [
         {
             'run': cliente.run,
@@ -60,18 +59,18 @@ def buscar_clientes(request):
         for cliente in clientes
     ]
 
-    print(f"Datos enviados al frontend: {clientes_data}")  # Log para verificar los datos enviados
+    print(f"Datos enviados al frontend: {clientes_data}") 
     return JsonResponse({'clientes': clientes_data})
 
 def buscar_promociones(request):
-    query = request.GET.get('q', '')  # Obtener el término de búsqueda
+    query = request.GET.get('q', '')  
     promociones = Promocion.objects.filter(
         nombre__icontains=query
     ) | Promocion.objects.filter(
         descripcion__icontains=query
-    )  # Filtrar por nombre o descripción
+    )  
 
-    # Serializar los resultados
+    
     promociones_data = [
         {
             'id': promo.id,
@@ -107,10 +106,10 @@ def crear_movimiento(request):
             # Actualizar los puntos del cliente
             cliente.puntos += movimiento.puntos
             if cliente.puntos < 0:
-                cliente.puntos = 0  # Evitar que los puntos sean negativos
+                cliente.puntos = 0  # Evita que los puntos sean negativos
             cliente.save()
 
-            # Guardar el movimiento
+            
             movimiento.save()
             return redirect('inicio')
     else:
@@ -120,44 +119,41 @@ def crear_movimiento(request):
 @login_required
 def crear_promocion(request):
     if request.method == 'POST':
-        producto_form = ProductoForm(request.POST, prefix='producto')
-        promocion_form = PromocionForm(request.POST, prefix='promocion')
-        tipo_form = TipoDescuentoForm(request.POST, prefix='tipo')
-        detalle_form = DetallePromocionForm(request.POST, prefix='detalle')  # Agregar el formulario de detalle
+        formulario = request.POST.get('formulario')
 
-        if producto_form.is_valid() and promocion_form.is_valid() and tipo_form.is_valid() and detalle_form.is_valid():
-            producto = producto_form.save()
-            promocion = promocion_form.save(commit=False)
-            promocion.save()
-            tipo_descuento = tipo_form.save()
-            detalle_promocion = detalle_form.save(commit=False)
-            detalle_promocion.promocion = promocion  # Vincular el detalle con la promoción creada
-            detalle_promocion.save()
-            return redirect('inicio')
-        else:
-            # Depuración: Imprimir errores en la consola
-            print("Errores en ProductoForm:", producto_form.errors)
-            print("Errores en PromocionForm:", promocion_form.errors)
-            print("Errores en TipoDescuentoForm:", tipo_form.errors)
-            print("Errores en DetallePromocionForm:", detalle_form.errors)
+        if formulario == 'registrar_producto':
+            producto_form = ProductoForm(request.POST)
+            if producto_form.is_valid():
+                producto_form.save()
+                return render(request, 'aplicacion/promocionesadd.html', {
+                    'mensaje_producto': 'Producto registrado correctamente.',
+                    'producto_form': ProductoForm(),
+                    'promocion_form': PromocionForm(),
+                })
+            else:
+                return render(request, 'aplicacion/promocionesadd.html', {
+                    'producto_form': producto_form,
+                    'promocion_form': PromocionForm(),
+                })
 
-            return render(request, 'aplicacion/promocionesadd.html', {
-                'producto_form': producto_form,
-                'promocion_form': promocion_form,
-                'tipo_form': tipo_form,
-                'detalle_form': detalle_form,  # Pasar el formulario de detalle al contexto
-            })
-    else:
-        producto_form = ProductoForm(prefix='producto')
-        promocion_form = PromocionForm(prefix='promocion')
-        tipo_form = TipoDescuentoForm(prefix='tipo')
-        detalle_form = DetallePromocionForm(prefix='detalle')  # Crear el formulario de detalle
+        elif formulario == 'registrar_promocion':
+            promocion_form = PromocionForm(request.POST)
+            if promocion_form.is_valid():
+                promocion_form.save()
+                return render(request, 'aplicacion/promocionesadd.html', {
+                    'mensaje_promocion': 'Promoción registrada correctamente.',
+                    'producto_form': ProductoForm(),
+                    'promocion_form': PromocionForm(),
+                })
+            else:
+                return render(request, 'aplicacion/promocionesadd.html', {
+                    'producto_form': ProductoForm(),
+                    'promocion_form': promocion_form,
+                })
 
     return render(request, 'aplicacion/promocionesadd.html', {
-        'producto_form': producto_form,
-        'promocion_form': promocion_form,
-        'tipo_form': tipo_form,
-        'detalle_form': detalle_form,  # Pasar el formulario de detalle al contexto
+        'producto_form': ProductoForm(),
+        'promocion_form': PromocionForm(),
     })
 
 @login_required
@@ -173,18 +169,18 @@ def cargar_cliente(request, run):
 
 @login_required
 def modificar_cliente(request, run):
-    print(f"Run recibido para modificar: {run}")  # Log para verificar el RUN recibido
+    print(f"Run recibido para modificar: {run}")
     cliente = get_object_or_404(Cliente, run=run)
-    print(f"Cliente encontrado: {cliente}")  # Log para verificar el cliente encontrado
+    print(f"Cliente encontrado: {cliente}")
 
     if request.method == 'POST':
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
             form.save()
-            print("Cliente modificado exitosamente.")  # Log para éxito en la modificación
+            print("Cliente modificado exitosamente.")
             return redirect('inicio')
         else:
-            print(f"Errores en el formulario: {form.errors}")  # Log para errores en el formulario
+            print(f"Errores en el formulario: {form.errors}")
     else:
         form = ClienteForm(instance=cliente)
     
@@ -226,57 +222,41 @@ def eliminar_promocion(request, id):
 
 @login_required
 def generar_reporte_promocion(request, promocion_id):
-    # Obtener la promoción
-    promocion = Promocion.objects.annotate(
-        total_descuento=Sum('detallepromocion__valor_descuento'),
-        impacto_economico=F('usos') * F('detallepromocion__valor_descuento')
-    ).get(id=promocion_id)
+    promocion = get_object_or_404(Promocion, id=promocion_id)
 
-    template_path = 'aplicacion/reporte_promocion.html'
+    total_descuento = promocion.valor_descuento * promocion.usos
+    impacto_economico = total_descuento 
+
     context = {
         'promocion': promocion,
         'usuario': request.user,
         'usos': promocion.usos,
-        'total_descuento': promocion.total_descuento or 0,
-        'impacto_economico': promocion.impacto_economico or 0,
+        'total_descuento': total_descuento,
+        'impacto_economico': impacto_economico,
     }
+
+    # Renderizar el HTML del reporte
+    template_path = 'aplicacion/reporte_promocion.html'
     html = render_to_string(template_path, context)
 
     # Crear el archivo PDF
-    nombre_archivo = f"reporte_promocion_{promocion.id}_{request.user.username}.pdf"
-    ruta_pdf = os.path.join(settings.STATICFILES_DIRS[0], 'pdf')
-    if not os.path.exists(ruta_pdf):
-        os.makedirs(ruta_pdf)
-    ruta_archivo = os.path.join(ruta_pdf, nombre_archivo)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="reporte_promocion_{promocion.id}.pdf"'
+    pisa_status = pisa.CreatePDF(html, dest=response)
 
-    with open(ruta_archivo, 'wb') as archivo_pdf:
-        pisa_status = pisa.CreatePDF(html, dest=archivo_pdf)
-
-    # Verificar si hubo errores
+    # Verificar si hubo errores al generar el PDF
     if pisa_status.err:
         return HttpResponse('Hubo un error al generar el reporte.', status=500)
 
-    # Guardar el reporte en la base de datos
-    ReportePromocion.objects.create(
-        usuario=request.user,
-        nombre_archivo=nombre_archivo,
-        promocion=promocion
-    )
-
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
-    with open(ruta_archivo, 'rb') as archivo_pdf:
-        response.write(archivo_pdf.read())
     return response
 
 @login_required
 def sistema_transaccional(request):
     if request.method == 'POST':
-        formulario = request.POST.get('formulario')  # Identificar el formulario enviado
+        formulario = request.POST.get('formulario')
         print(f"Formulario enviado: {formulario}")
 
         if formulario == 'registrar_transaccion':
-            # Procesar el formulario de registrar transacción
             cliente_run = request.POST.get('cliente')
             promocion_id = request.POST.get('promocion')
             producto_id = request.POST.get('producto')
@@ -322,7 +302,6 @@ def sistema_transaccional(request):
             })
 
         elif formulario == 'actualizar_puntos':
-            # Procesar el formulario de actualizar puntos
             cliente_run = request.POST.get('cliente_puntos')
             puntos = request.POST.get('puntos')
 
@@ -343,7 +322,7 @@ def sistema_transaccional(request):
 
             cliente.puntos += puntos
             if cliente.puntos < 0:
-                cliente.puntos = 0  # Evitar puntos negativos
+                cliente.puntos = 0  # Evita puntos negativos
             cliente.save()
 
             return render(request, 'aplicacion/transaccion.html', {
@@ -353,7 +332,6 @@ def sistema_transaccional(request):
                 'productos': Producto.objects.all(),
             })
 
-    # Si es una solicitud GET, renderiza la página con los datos necesarios
     return render(request, 'aplicacion/transaccion.html', {
         'clientes': Cliente.objects.all(),
         'promociones': Promocion.objects.filter(activo=True),

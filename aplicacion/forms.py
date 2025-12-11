@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 import datetime
 from aplicacion.models import Cliente, MovimientoPuntos
-from aplicacion2.models import Producto, Promocion, ProductoPromocion, DetallePromocion, TipoDescuento
+from aplicacion2.models import Producto, Promocion
 
 class ClienteForm(forms.ModelForm):
     run = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'EJ: 123456789'}))
@@ -83,29 +83,20 @@ class MovimientoPuntosForm(forms.ModelForm):
             raise forms.ValidationError("Los puntos no pueden ser cero.")
         return puntos
 
-class TipoDescuentoForm(forms.ModelForm):
-    nombre = forms.CharField(widget= forms.TextInput(attrs= {'class':'form-control', 'placeholder':'Ingrese el tipo de descuento'}))
-    descripcion = forms.CharField(widget= forms.TextInput(attrs= {'class':'form-control', 'placeholder':'Ingrese una descripción breve'}))
-
-    def clean_nombre(self):
-        nombre = self.cleaned_data['nombre']
-        return nombre.lower()
-    
-    def clean_descripcion(self):
-        descripcion = self.cleaned_data['descripcion']
-        return descripcion.lower()
-
-    class Meta:
-        model = TipoDescuento
-        fields = '__all__'
-
 class PromocionForm(forms.ModelForm):
+    TIPO_DESCUENTO_CHOICES = [
+        ('porcentual', 'Porcentual'),
+        ('dinero', 'Resta en dinero'),
+    ]
+
     nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el nombre de la promoción'}))
-    descripcion = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese una descripción'}))
+    descripcion = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Ingrese una descripción'}))
     fecha_inicio = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
     fecha_fin = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
     activo = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
-    usos = forms.IntegerField(widget=forms.HiddenInput(), initial=0)  # Campo oculto con valor predeterminado
+    tipo_descuento = forms.ChoiceField(choices=TIPO_DESCUENTO_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
+    codigo_promocional = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el código promocional'}))
+    valor_descuento = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el valor del descuento'}))
 
     def clean_nombre(self):
         nombre = self.cleaned_data['nombre']
@@ -149,30 +140,11 @@ class PromocionForm(forms.ModelForm):
     
     class Meta:
         model = Promocion
-        fields = ['nombre', 'descripcion', 'fecha_inicio', 'fecha_fin', 'activo', 'usos']
-
-class DetallePromocionForm(forms.ModelForm):
-    promocion = forms.ModelChoiceField(
-        queryset=Promocion.objects.all(),
-        empty_label="Seleccione una promoción",
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
-    tipo_descuento = forms.ModelChoiceField(
-        queryset=TipoDescuento.objects.all(),
-        empty_label="Seleccione el tipo de descuento",
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
-    valor_descuento = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el valor en pesos'}))  # Cambiado a IntegerField
-    codigo_promocional = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el código promocional'}), required=False)
-    condicion = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese una condición breve'}), required=False)
-
-    class Meta:
-        model = DetallePromocion
-        fields = '__all__'
+        fields = ['nombre', 'descripcion', 'fecha_inicio', 'fecha_fin', 'activo', 'tipo_descuento', 'codigo_promocional', 'valor_descuento']
 
 class ProductoForm(forms.ModelForm):
     nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese nombre de producto'}))
-    precio = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese precio en pesos'}))  # Cambiado a IntegerField
+    precio = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese precio en pesos'}))
 
     def clean_nombre(self):
         nombre = self.cleaned_data['nombre']
@@ -180,21 +152,4 @@ class ProductoForm(forms.ModelForm):
 
     class Meta:
         model = Producto
-        fields = '__all__'
-
-class ProductoPromocionForm(forms.ModelForm):
-    producto = forms.ModelChoiceField(
-        queryset= Producto.objects.all(),
-        empty_label= "Seleccione un producto",
-        widget= forms.Select(attrs= {'class':'form-control'})
-    )
-
-    promocion = forms.ModelChoiceField(
-        queryset= Promocion.objects.all(),
-        empty_label= "Seleccione la promoción",
-        widget= forms.Select(attrs= {'class':'form-control'})
-    )
-
-    class Meta:
-        model = ProductoPromocion
         fields = '__all__'

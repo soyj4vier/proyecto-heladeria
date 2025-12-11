@@ -43,6 +43,21 @@
                             {{ form.fecha_fin.errors }}
                         </div>
                         <div class="col-md-6 mb-3">
+                            {{ form.tipo_descuento.label_tag }}
+                            {{ form.tipo_descuento }}
+                            {{ form.tipo_descuento.errors }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.valor_descuento.label_tag }}
+                            {{ form.valor_descuento }}
+                            {{ form.valor_descuento.errors }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.codigo_promocional.label_tag }}
+                            {{ form.codigo_promocional }}
+                            {{ form.codigo_promocional.errors }}
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <div class="form-check mt-4">
                                 {{ form.activo }}
                                 {{ form.activo.label_tag }}
